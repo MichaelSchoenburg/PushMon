@@ -1,0 +1,126 @@
+[CmdletBinding()]
+param (
+    [Parameter()]
+    [ValidateSet('ColorAtPos')]
+    [string]
+    $Method = 'ColorAtPos'
+)
+
+function Get-ScreenColor {
+    <#
+    .SYNOPSIS
+    Gets the color of the pixel under the mouse, or of the specified space.
+    .DESCRIPTION
+    Returns the pixel color either under the mouse, or of a location onscreen using X/Y locating.  If no parameters are supplied, the mouse cursor position will be retrived and used.
+ 
+    Current Version - 1.0
+    .EXAMPLE
+    Mouse-Color
+    Returns the color of the pixel directly under the mouse cursor.
+    .EXAMPLE
+    Mouse-Color -X 300 -Y 300
+    Returns the color of the pixel 300 pixels from the top of the screen and 300 pixels from the left.
+    .PARAMETER X
+    Distance from the top of the screen to retrieve color, in pixels.
+    .PARAMETER Y
+    Distance from the left of the screen to retrieve color, in pixels.
+    .NOTES
+    Author: Malil
+    Source: https://community.spiceworks.com/scripts/show/4263-get-screencolor
+ 
+    Revision History
+    Version 1.0
+        - Live release.  Contains two parameter sets - an empty default, and an X/Y set.
+    #>
+ 
+    #Requires -Version 4.0
+ 
+    [CmdletBinding(DefaultParameterSetName='None')]
+ 
+    param(
+        [Parameter(
+            Mandatory=$true,
+            ParameterSetName="Pos"
+        )]
+        [Int]
+        $X,
+        [Parameter(
+            Mandatory=$true,
+            ParameterSetName="Pos"
+        )]
+        [Int]
+        $Y
+    )
+     
+    if ($PSCmdlet.ParameterSetName -eq 'None') {
+        $pos = [System.Windows.Forms.Cursor]::Position
+    } else {
+        $pos = New-Object psobject
+        $pos | Add-Member -MemberType NoteProperty -Name "X" -Value $X
+        $pos | Add-Member -MemberType NoteProperty -Name "Y" -Value $Y
+    }
+    $map = [System.Drawing.Rectangle]::FromLTRB($pos.X, $pos.Y, $pos.X + 1, $pos.Y + 1)
+    $bmp = New-Object System.Drawing.Bitmap(1,1)
+    $graphics = [System.Drawing.Graphics]::FromImage($bmp)
+    $graphics.CopyFromScreen($map.Location, [System.Drawing.Point]::Empty, $map.Size)
+    $pixel = $bmp.GetPixel(0,0)
+    $red = $pixel.R
+    $green = $pixel.G
+    $blue = $pixel.B
+    $result = New-Object psobject
+    if ($PSCmdlet.ParameterSetName -eq 'None') {
+        $result | Add-Member -MemberType NoteProperty -Name "X" -Value $([System.Windows.Forms.Cursor]::Position).X
+        $result | Add-Member -MemberType NoteProperty -Name "Y" -Value $([System.Windows.Forms.Cursor]::Position).Y
+    }
+    $result | Add-Member -MemberType NoteProperty -Name "Red" -Value $red
+    $result | Add-Member -MemberType NoteProperty -Name "Green" -Value $green
+    $result | Add-Member -MemberType NoteProperty -Name "Blue" -Value $blue
+    return $result
+}
+ 
+function Get-MousePosition {
+    Add-Type -AssemblyName System.Windows.Forms
+ 
+    $x = [System.Windows.Forms.Cursor]::Position.X
+    $y = [System.Windows.Forms.Cursor]::Position.Y
+ 
+    return $x, $y
+}
+
+switch ($Method) {
+    'ColorAtPos' {
+        Write-Host "Hover over the position with your mouse and press any key to monitor it..."
+        $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+        $x, $y = Get-MousePosition
+        $InitialColor = Get-ScreenColor -X $x -Y $y
+         
+        # Monitoring
+        do {
+            Clear-Host
+            Write-Host "Mouse position = x: $( $x ) y: $( $y )"
+            Write-Host "Initial color = $( $InitialColor )"
+            Write-Host 'Monitoring Color...'
+            Start-Sleep -Seconds 1
+            $CurrentColor = Get-ScreenColor -X $X -Y $Y
+        } until ($CurrentColor.PSObject.ToString() -ne $InitialColor.PSObject.ToString())
+         
+        Write-Host 'Color at given screen position has changed. Sending notification...' -ForegroundColor Yellow
+         
+        $apiKeyUrl = "https://api.pushover.net/1/messages.json"
+         
+        # This is the notification data, which gets converted to JSON
+        $body = @{
+            "token"="axqme1mumczco3dz9pdu8j6pi4afwk"
+            "user"="us8je18d94k4poe3s4a623ffydoog7"
+            "message"="The color at the given screen position has changed."
+        } | ConvertTo-Json
+        
+        # This header tells we're passing a JSON payload
+        $header = @{
+            "Content-Type"="application/json"
+        }
+         
+        # Notify17 invocation
+        Invoke-RestMethod -Uri $apiKeyUrl -Method 'Post' -Body $body -Headers $header
+    }
+}
