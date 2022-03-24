@@ -60,9 +60,9 @@ param (
     [Parameter(
         Mandatory = $true
     )]
-    [ValidateSet('ColorAtPos')]
+    [ValidateSet('CursorAtPos')]
     [string]
-    $Method = 'ColorAtPos',
+    $Method = 'CursorAtPos',
 
     [Parameter(
         Mandatory = $true
@@ -241,7 +241,7 @@ Your specified user key              = $( $UserKey )
 "
 
 switch ($Method) {
-    'ColorAtPos' {
+    'CursorAtPos' {
         Write-Host "Hover over the position with your mouse and press any key to monitor it..."
         $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
         $x, $y = Get-MousePosition
@@ -249,7 +249,6 @@ switch ($Method) {
          
         # Monitoring
         do {
-            Clear-Host
             Write-Host "Mouse position = x: $( $x ) y: $( $y )"
             Write-Host "Initial color = $( $InitialColor )"
             Write-Host 'Monitoring Color...'
@@ -263,14 +262,14 @@ switch ($Method) {
          
         # This is the notification data, which gets converted to JSON
         $body = @{
-            "token"=$ApiToken
-            "user"=$UserKey
-            "message"="The color at the given screen position has changed."
+            "token" = $ApiToken
+            "user" = $UserKey
+            "message" = "The color at the given screen position has changed."
         } | ConvertTo-Json
         
         # This header tells we're passing a JSON payload
         $header = @{
-            "Content-Type"="application/json"
+            "Content-Type" = "application/json"
         }
          
         # Notify17 invocation
