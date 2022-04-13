@@ -1,4 +1,4 @@
-![GitHub](https://img.shields.io/github/license/MichaelSchoenburg/PushMon?style=plastic) ![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/michaelschoenburg/pushmon?include_prereleases&style=plastic) ![GitHub last commit](https://img.shields.io/github/last-commit/michaelschoenburg/pushmon?style=plastic) [![PSScriptAnalyzer](https://github.com/MichaelSchoenburg/PushMon/actions/workflows/powershell.yml/badge.svg)](https://github.com/MichaelSchoenburg/PushMon/actions/workflows/powershell.yml)
+![GitHub](https://img.shields.io/github/license/MichaelSchoenburg/PushMon) ![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/michaelschoenburg/pushmon?include_prereleases) ![GitHub last commit](https://img.shields.io/github/last-commit/michaelschoenburg/pushmon) [![PSScriptAnalyzer](https://github.com/MichaelSchoenburg/PushMon/actions/workflows/powershell.yml/badge.svg)](https://github.com/MichaelSchoenburg/PushMon/actions/workflows/powershell.yml)
 
 # PushNotification
 PowerShell script that sends push notifications via Pushover for predefined monitoring methods.
