@@ -7,4 +7,5 @@ PowerShell script that sends push notifications via Pushover for predefined moni
 
 # Possible Shortcut
 One could create a shortcut containing this command (if the script is placed in the current users downloads folder).
+
 `PowerShell.exe -ExecutionPolicy Bypass -File "%userprofile%\Downloads\New-PushMon.ps1" -Method CursorAtPos -ApiToken IncertHere -UserKey IncertHere`
