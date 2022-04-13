@@ -55,7 +55,6 @@
     Libraries, Modules, ...
 #>
 
-[CmdletBinding()]
 param (
     [Parameter(
         Mandatory = $true
@@ -83,7 +82,9 @@ param (
     Declare local variables and global variables
 #>
 
-# None, yet.
+# From https://gist.github.com/WillemRB/5eb18301462ed6eb23bf
+$Frames = '|', '/', '-', '\'
+$Counter = 0
 
 #endregion DECLARATIONS
 #region FUNCTIONS
@@ -220,25 +221,24 @@ function Get-MousePosition {
     Script entry point
 #>
 
-Write-Host "
-██████  ██    ██ ███████ ██   ██ ███    ███  ██████  ███    ██   ▄▀ ▄▀    
-██   ██ ██    ██ ██      ██   ██ ████  ████ ██    ██ ████   ██    ▀  ▀    
-██████  ██    ██ ███████ ███████ ██ ████ ██ ██    ██ ██ ██  ██  █▀▀▀▀▀█▄  
-██      ██    ██      ██ ██   ██ ██  ██  ██ ██    ██ ██  ██ ██  █░░░░░█─█ 
-██       ██████  ███████ ██   ██ ██      ██  ██████  ██   ████  ▀▄▄▄▄▄▀▀  
-                           by Michael Schönburg                                                                               
-     __                                                             
-    |__  _  | _    _ _||_  _  _|    _  _| _ . _ . _|_ _ _ |_. _  _  
-    |(_)|   |(_|\/(-(_||_)(_|(_|(  (_|(_|||||| )|_)|_| (_||_|(_)| ) 
-                /                                                   
-" -ForegroundColor Yellow
+Write-Host ""
+# Write-Host "██████  ██    ██ ███████ ██   ██ ███    ███  ██████  ███    ██   ▄▀ ▄▀    " -ForegroundColor Yellow
+# Write-Host "██   ██ ██    ██ ██      ██   ██ ████  ████ ██    ██ ████   ██    ▀  ▀    " -ForegroundColor Yellow
+# Write-Host "██████  ██    ██ ███████ ███████ ██ ████ ██ ██    ██ ██ ██  ██  █▀▀▀▀▀█▄  " -ForegroundColor Yellow
+# Write-Host "██      ██    ██      ██ ██   ██ ██  ██  ██ ██    ██ ██  ██ ██  █░░░░░█─█ " -ForegroundColor Yellow
+# Write-Host "██       ██████  ███████ ██   ██ ██      ██  ██████  ██   ████  ▀▄▄▄▄▄▀▀  " -ForegroundColor Yellow
+Write-Host "                           Write-Host by Michael Schönburg                " -ForegroundColor Yellow
+Write-Host "     __                                                                   " -ForegroundColor Yellow
+Write-Host "    |__  _  | _    _ _||_  _  _|    _  _| _ . _ . _|_ _ _ |_. _  _        " -ForegroundColor Yellow
+Write-Host "    |(_)|   |(_|\/(-(_||_)(_|(_|(  (_|(_|||||| )|_)|_| (_||_|(_)| )       " -ForegroundColor Yellow
+Write-Host "                /                                                         " -ForegroundColor Yellow
+Write-Host "" -ForegroundColor Yellow
 # Font from https://patorjk.com/software/taag
 # Coffee from https://fsymbols.com/text-art/twitter/#all_cats
-"-------------------------------------------------------------------------
-Your specified monitoring method     = $( $Method )
-Your specified API token             = $( $ApiToken )
-Your specified user key              = $( $UserKey )
-"
+"-------------------------------------------------------------------------"
+Write-Host "Your specified monitoring method     = $( $Method )"
+Write-Host "Your specified API token             = $( $ApiToken )"
+Write-Host "Your specified user key              = $( $UserKey )"
 
 switch ($Method) {
     'CursorAtPos' {
@@ -246,14 +246,19 @@ switch ($Method) {
         $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
         $x, $y = Get-MousePosition
         $InitialColor = Get-ScreenColor -X $x -Y $y
-         
+        
+        Write-Host "Mouse position = x: $( $x ) y: $( $y )"
+        Write-Host "Initial color = $( $InitialColor )"
+        Write-Host 'Monitoring Color...'
+
         # Monitoring
         do {
-            Write-Host "Mouse position = x: $( $x ) y: $( $y )"
-            Write-Host "Initial color = $( $InitialColor )"
-            Write-Host 'Monitoring Color...'
-            Start-Sleep -Seconds 1
-            $CurrentColor = Get-ScreenColor -X $X -Y $Y
+                $frame = $frames[$counter % $frames.Length]
+                Write-Host "$frame" -NoNewLine
+                [Console]::SetCursorPosition(0, $cursorTop)
+                $counter += 1
+
+                $CurrentColor = Get-ScreenColor -X $X -Y $Y
         } until ($CurrentColor.PSObject.ToString() -ne $InitialColor.PSObject.ToString())
          
         Write-Host 'Color at given screen position has changed. Sending notification...' -ForegroundColor Yellow
