@@ -227,7 +227,7 @@ Write-Host "   / __ \__  _______/ /_  /  |/  /___  ____ " -ForegroundColor Yello
 Write-Host "  / /_/ / / / / ___/ __ \/ /|_/ / __ \/ __ \" -ForegroundColor Yellow
 Write-Host " / ____/ /_/ (__  ) / / / /  / / /_/ / / / /" -ForegroundColor Yellow
 Write-Host "/_/    \__,_/____/_/ /_/_/  /_/\____/_/ /_/ " -ForegroundColor Yellow
-Write-Host "                        by Michael Schönburg" -ForegroundColor Yellow
+Write-Host "                        by Michael Schoenburg" -ForegroundColor Yellow
 Write-Host ""
 # Font from https://patorjk.com/software/taag
 "-------------------------------------------------------------------------"
